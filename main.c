@@ -71,7 +71,7 @@ void displayMenu() {
     printf("\n===== Smart Home Menu =====\n");
     printf("1. Toggle Light\n");  
     printf("2. Read Temperature\n");  
-    printf("3. Check Motion Sensor");  
+    printf("3. Check Motion Sensor\n");  
     printf("4. Lock/Unlock Security System\n");  
     printf("5. House Status Summary\n");  
     printf("6. Exit\n");  
@@ -91,15 +91,80 @@ void controlLights() {
 
 }
 void readTemperature() {
+    int room;
+    printf("Enter room number (1-%d):",MAX_ROOMS);
+    scanf("%d",&room);
+    if(room>=1 && room<=MAX_ROOMS){
+        printf("Temperature in Room %d: %d c\n",room,temperatures[room-1]);
+
+        if (temperatures[room-1]>30){
+            printf("WARNING: Room %d is too hot! consider it down.\n",room);
+    }
+    }else{
+        printf("Invalid room number!\n");
     
+    }
 
 }
 void detectMotion() {
+    int room;
+    printf("Enter room number (1-%d);",MAX_ROOMS);
+    scanf("%d",&room);
+
+    if(room>=1 && room<= MAX_ROOMS){
+        printf("Motion in Room %d: %s\n",room,motionSenors[room-1]?"DETECTED": "NO MOTION");
+
+        if(!motionSenors[room-1]){
+            motionCounter++;
+        }else{
+            motionCounter=0;
+        }
+    }else{
+        printf("Invalid room number!\n");
+    }
 
 }
 void securitySystem() {
+    int room;
+    printf("Enter room number (1-%d);",MAX_ROOMS);
+    scanf("%d",&room);
 
+    if(room>=1 && room<= MAX_ROOMS){
+        securitylocks[room-1]=!securitylocks[room-1];
+        printf("Room %d door is now %s.\n",room,securitylocks[room-1]?"LOCKED": "UNLOCKED");
+        }else{
+            printf("Invalid room number!\n");
+        }
 }
-void analyzeHouseStatus() {
 
+void analyzeHouseStatus() {
+    printf("\n==== House Status ====\n");
+
+    for(int i=0; i<MAX_ROOMS; i++){
+        printf("Room %d: Light %s, Temp %dc, Motion %s, Door %s\n",
+            i+1,
+            lights[i]? "ON" : "OFF",
+            temperatures[i],
+            motionSenors[i]? "DETECTED" : "NO MOTION",
+            securitylocks[i]? "LOCKED" : "UNLOCKED");
+    }
+
+    int allLightsOn=1;
+    for (int i=0;i<MAX_ROOMS;i++){
+        if (!lights[i]){
+            allLightsOn=0;
+            break;
+        }
+    }
+    if(allLightsOn){
+        printf("ENERGY SAVING TIP: All lights are ON. Consider turning some OFF.\n");
+    }
+
+    if(motionCounter>=5){
+        for(int i=0; i<MAX_ROOMS; i++){
+            securitylocks[i]=1;
+        }
+        printf("AUTO-LOCK; No motion detected for a while. All doors have been locked.\n");
+        motionCounter=0;
+    }
 }
